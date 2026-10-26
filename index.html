@@ -78,9 +78,10 @@ setInterval(()=>{const b=CREW[Math.random()*4|0];const r=Math.random();if(r<.3){
 const bub=document.getElementById('bubble');
 function talk(b){const r=b.el.getBoundingClientRect();bub.innerHTML=`<b>${b.n}</b>${b.lines[Math.random()*b.lines.length|0]}<br><a href="grokbot://app/v1/agent?id=${b.id}">Talk to ${b.n}</a>`;bub.style.display='block';bub.style.left=Math.max(8,Math.min(innerWidth-270,r.left-100))+'px';bub.style.top=Math.max(8,r.top-120)+'px'}
 document.body.onclick=()=>bub.style.display='none';
-let z=false;function fit(){const base=Math.min(innerWidth/900,innerHeight/420);const s=z?base*1.0:base*.45;W.style.transform=`scale(${s})`;zoom.textContent=z?'🔭 Zoom out':'🔍 Zoom in'}
+let z=false,px=0;function fit(){const base=Math.min(innerWidth/900,innerHeight/420);const s=z?Math.max(base,Math.min(innerHeight*.5/420,innerWidth/380)):base*.45;const lim=Math.max(0,(900*s-innerWidth)/2+20);px=z?Math.max(-lim,Math.min(lim,px)):0;W.style.transform=`translateX(${px}px) scale(${s})`;zoom.textContent=z?'🔭 Zoom out':'🔍 Zoom in'}
 zoom.onclick=e=>{e.stopPropagation();z=!z;fit()};addEventListener('resize',fit);fit();
 let d0=0;addEventListener('touchmove',e=>{if(e.touches.length==2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(d0){if(d-d0>40&&!z){z=true;fit()}if(d0-d>40&&z){z=false;fit()}}else d0=d}},{passive:true});addEventListener('touchend',()=>d0=0);
+let dx=null;addEventListener('pointerdown',e=>dx=e.clientX);addEventListener('pointermove',e=>{if(dx!==null&&z){px+=e.clientX-dx;dx=e.clientX;W.style.transition='none';fit()}});addEventListener('pointerup',()=>{dx=null;W.style.transition=''});
 addEventListener('wheel',e=>{z=e.deltaY<0;fit()});
 fetch('activity.json?'+Date.now()).then(r=>r.json()).then(a=>{a.sort((x,y)=>new Date(y.time)-new Date(x.time));
 a.slice(0,3).forEach(en=>{const b=CREW.find(c=>c.n==en.bot);if(b&&en.room)place(b,en.room)});
