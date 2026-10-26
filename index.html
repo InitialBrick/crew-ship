@@ -1,0 +1,90 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Crew Ship</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b1030"><link rel="icon" href="icon.svg">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0b1030;font-family:system-ui,sans-serif;color:#fff}
+#space{position:absolute;inset:0;overflow:hidden}
+.layer{position:absolute;inset:0;width:200%;background-repeat:repeat}
+#stars1{animation:drift 60s linear infinite}#stars2{animation:drift 25s linear infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.planet{position:absolute;border-radius:50%;animation:pass linear infinite}
+@keyframes pass{from{left:110%}to{left:-30%}}
+#world{position:absolute;left:50%;top:50%;width:900px;height:420px;margin:-210px 0 0 -450px;transition:transform .8s ease;}
+#bob{width:100%;height:100%;animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-12px) rotate(.6deg)}}
+.flame{animation:fl .2s infinite alternate}@keyframes fl{to{transform:scaleX(.8)}}
+.bot{position:absolute;width:44px;height:64px;transition:left 3s linear,top 3s linear;cursor:pointer;z-index:5}
+.bot svg{animation:idle 1.6s ease-in-out infinite}.bot.walk svg{animation:walk .35s infinite alternate}
+@keyframes idle{50%{transform:translateY(-2px)}}@keyframes walk{from{transform:rotate(-6deg)}to{transform:rotate(6deg) translateY(-3px)}}
+.tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;background:#0008;padding:1px 5px;border-radius:6px;white-space:nowrap}
+#bubble{position:fixed;display:none;z-index:20;background:#fff;color:#222;border-radius:16px;padding:12px 14px;max-width:260px;box-shadow:0 6px 20px #0008}
+#bubble b{display:block;margin-bottom:4px}#bubble a{display:inline-block;margin-top:8px;background:#5b6cff;color:#fff;padding:7px 12px;border-radius:10px;text-decoration:none;font-weight:600}
+#hud{position:fixed;top:10px;right:10px;background:#0009;border:1px solid #fff3;border-radius:12px;padding:8px 12px;font-size:13px;z-index:10;min-width:140px}
+#hud .tot{font-size:20px;font-weight:800;color:#7dffb0}#hud small{opacity:.6}
+#ticker{position:fixed;left:0;right:0;bottom:0;background:#000a;padding:8px 12px;font-size:13px;z-index:10;white-space:nowrap;overflow:hidden}
+#zoom{position:fixed;top:10px;left:10px;z-index:10;background:#5b6cff;border:0;color:#fff;padding:8px 12px;border-radius:10px;font-weight:700}
+.hint{position:fixed;top:52px;left:12px;font-size:11px;opacity:.6;z-index:10}
+</style></head><body>
+<div id="space"><div class="layer" id="stars1"></div><div class="layer" id="stars2"></div>
+<div class="planet" style="top:12%;width:90px;height:90px;background:radial-gradient(circle at 30% 30%,#ffb27d,#c2502d);animation-duration:70s"></div>
+<div class="planet" style="top:72%;width:50px;height:50px;background:radial-gradient(circle at 30% 30%,#9ef0d5,#2a7f8f);animation-duration:45s;animation-delay:-20s"></div>
+<div class="planet" style="top:30%;width:160px;height:160px;opacity:.5;background:radial-gradient(circle at 30% 30%,#c7a8ff,#4b2c8f);animation-duration:120s;animation-delay:-60s"></div></div>
+<div id="world"><div id="bob">
+<svg viewBox="0 0 900 420" width="900" height="420" style="position:absolute;inset:0">
+<g class="flame" style="transform-origin:60px 210px"><path d="M70 170 L0 210 L70 250Z" fill="#ffb02e"/><path d="M70 185 L30 210 L70 235Z" fill="#fff36b"/></g>
+<path d="M70 120 Q60 210 70 300 L760 300 Q890 260 890 210 Q890 160 760 120Z" fill="#dfe6f5" stroke="#8a95b5" stroke-width="6"/>
+<path d="M200 120 L150 40 L300 120Z M200 300 L150 380 L300 300Z" fill="#ff6b6b" stroke="#a33" stroke-width="5"/>
+<g id="rooms">
+<rect x="95" y="140" width="190" height="145" rx="10" fill="#2b3a67"/>
+<rect x="295" y="140" width="190" height="145" rx="10" fill="#3a2b5c"/>
+<rect x="495" y="140" width="190" height="145" rx="10" fill="#1f4d4a"/>
+<rect x="695" y="140" width="110" height="145" rx="10" fill="#22305a"/>
+<!-- design studio (Pixel) -->
+<rect x="110" y="155" width="60" height="45" fill="#c94f7c"/><rect x="118" y="162" width="14" height="18" fill="#fff"/><rect x="136" y="162" width="14" height="18" fill="#ffe08a"/><rect x="154" y="162" width="12" height="18" fill="#9ef0d5"/>
+<rect x="190" y="235" width="80" height="12" fill="#a0764a"/><rect x="205" y="215" width="34" height="22" fill="#fff"/><text x="110" y="278" font-size="11" fill="#fff">BricksPrints Studio</text>
+<!-- trivia studio (Venture) -->
+<rect x="310" y="155" width="60" height="40" fill="#111" stroke="#7fd3ff" stroke-width="3"/><polyline points="315,188 330,178 345,182 365,162" fill="none" stroke="#7dffb0" stroke-width="3"/>
+<rect x="390" y="155" width="80" height="40" fill="#111" stroke="#ff6bd6" stroke-width="3"/><circle cx="430" cy="175" r="12" fill="none" stroke="#ffd34d" stroke-width="3"/><line x1="430" y1="175" x2="430" y2="166" stroke="#ffd34d" stroke-width="2"/>
+<text x="310" y="278" font-size="11" fill="#fff">Trivia O'Clock HQ</text>
+<!-- comms (Relay) -->
+<circle cx="530" cy="175" r="18" fill="#fff"/><line x1="530" y1="175" x2="530" y2="163" stroke="#222" stroke-width="3"/><line x1="530" y1="175" x2="539" y2="178" stroke="#222" stroke-width="3"/>
+<rect x="565" y="155" width="55" height="45" fill="#fff"/><rect x="565" y="155" width="55" height="10" fill="#ff6b6b"/><g fill="#999"><rect x="570" y="170" width="8" height="6"/><rect x="583" y="170" width="8" height="6"/><rect x="596" y="170" width="8" height="6"/><rect x="570" y="182" width="8" height="6"/></g>
+<rect x="645" y="145" width="18" height="140" rx="9" fill="#9ad0ff" opacity=".7"/><text x="505" y="278" font-size="11" fill="#fff">Comms &amp; Calendar</text>
+<!-- bridge (Pip) -->
+<path d="M760 150 Q805 175 760 270" fill="#7fd3ff" opacity=".6"/><rect x="705" y="150" width="40" height="34" fill="#fff"/><g fill="#5b6cff"><rect x="709" y="155" width="30" height="4"/><rect x="709" y="163" width="22" height="4"/><rect x="709" y="171" width="26" height="4"/></g>
+<path d="M715 235 h30 v25 h-30z M712 220 h8 v40 h-8z" fill="#ffd34d"/><text x="705" y="278" font-size="11" fill="#fff">Bridge</text>
+</g></svg>
+<div id="bots"></div></div></div>
+<button id="zoom">🔍 Zoom in</button><div class="hint">Tap a crew member to chat</div>
+<div id="hud"><small>PROFIT</small><div class="tot" id="ptot">$0.00</div><div id="prows"></div><small id="pupd"></small></div>
+<div id="ticker">Loading activity…</div>
+<div id="bubble"></div>
+<script>
+const W=document.getElementById('world'),stars=(n,s,c)=>{let g='';for(let i=0;i<n;i++)g+=`radial-gradient(${s}px ${s}px at ${Math.random()*100}% ${Math.random()*100}%,${c},transparent)`+(i<n-1?',':'');return g};
+stars1.style.backgroundImage=stars(40,1.5,'#fff8');stars1.style.backgroundSize='600px 600px';
+stars2.style.backgroundImage=stars(25,2.5,'#fff');stars2.style.backgroundSize='800px 800px';
+const ROOMS={design:[150,225],studio:[350,225],comms:[560,225],bridge:[735,225]};
+const CREW=[
+{n:'Pip',id:'d1d562e8-8e61-4836-890f-501af6a8fb51',home:'bridge',c:'#5b6cff',hat:'cap',lines:["Captain on deck! What's the mission?","Task board's looking good today.","Keeping the crew on course.","Steady as she goes."]},
+{n:'Venture',id:'512f2eb0-3d6f-41df-8245-91b5d665bc3c',home:'studio',c:'#ff6bd6',hat:'tie',lines:["Trivia O'Clock: guess before the timer!","Hook in the first second — always.","Checking today's views and follows.","Growth is a daily habit."]},
+{n:'Relay',id:'4926bc8f-2560-4bb4-8a1b-d155fdad3523',home:'comms',c:'#4fd1a5',hat:'head',lines:["Your calendar's under control.","Got a reminder queued up for you.","Mail tube is clear!","Want me to schedule something?"]},
+{n:'Pixel',id:'72215629-4232-4aaf-ba34-dca662381357',home:'design',c:'#ffb02e',hat:'beret',lines:["BricksPrints is open for business!","Fresh pins going up on Pinterest.","Designing the next printable.","Moving checklist is next on the list."]}];
+const hats={cap:'<path d="M8 14 Q22 0 36 14Z" fill="#223"/><rect x="18" y="4" width="8" height="4" fill="#ffd34d"/>',tie:'<path d="M22 34 l-3 4 3 10 3-10z" fill="#c22"/>',head:'<path d="M8 18 Q22 2 36 18" fill="none" stroke="#333" stroke-width="3"/><circle cx="8" cy="20" r="4" fill="#333"/>',beret:'<ellipse cx="22" cy="8" rx="14" ry="5" fill="#c94f7c"/>'};
+const bd=document.getElementById('bots');
+CREW.forEach(b=>{const e=document.createElement('div');e.className='bot';
+e.innerHTML=`<span class="tag">${b.n}</span><svg viewBox="0 0 44 64" width="44" height="64"><rect x="10" y="30" width="24" height="24" rx="10" fill="${b.c}"/><circle cx="22" cy="20" r="13" fill="#ffe2c4"/><circle cx="17" cy="19" r="2" fill="#222"/><circle cx="27" cy="19" r="2" fill="#222"/><path d="M17 25 Q22 29 27 25" stroke="#222" stroke-width="1.5" fill="none"/>${hats[b.hat]}<rect x="13" y="52" width="6" height="10" rx="3" fill="#334"/><rect x="25" y="52" width="6" height="10" rx="3" fill="#334"/></svg>`;
+b.el=e;bd.appendChild(e);place(b,b.home,0);e.onclick=ev=>{ev.stopPropagation();talk(b)}});
+function place(b,room,j=40){const[x,y]=ROOMS[room]||ROOMS[b.home];const nx=x-22+(Math.random()-.5)*j;const old=parseFloat(b.el.style.left)||nx;b.el.style.left=nx+'px';b.el.style.top=(y-50)+'px';b.room=room;if(Math.abs(old-nx)>5){b.el.classList.add('walk');setTimeout(()=>b.el.classList.remove('walk'),3000)}}
+setInterval(()=>{const b=CREW[Math.random()*4|0];const r=Math.random();if(r<.3){place(b,CREW[Math.random()*4|0].home)}else if(r<.6)place(b,b.home);else place(b,b.room,30)},3500);
+const bub=document.getElementById('bubble');
+function talk(b){const r=b.el.getBoundingClientRect();bub.innerHTML=`<b>${b.n}</b>${b.lines[Math.random()*b.lines.length|0]}<br><a href="grokbot://app/v1/agent?id=${b.id}">Talk to ${b.n}</a>`;bub.style.display='block';bub.style.left=Math.max(8,Math.min(innerWidth-270,r.left-100))+'px';bub.style.top=Math.max(8,r.top-120)+'px'}
+document.body.onclick=()=>bub.style.display='none';
+let z=false;function fit(){const base=Math.min(innerWidth/900,innerHeight/420);const s=z?base*1.0:base*.45;W.style.transform=`scale(${s})`;zoom.textContent=z?'🔭 Zoom out':'🔍 Zoom in'}
+zoom.onclick=e=>{e.stopPropagation();z=!z;fit()};addEventListener('resize',fit);fit();
+let d0=0;addEventListener('touchmove',e=>{if(e.touches.length==2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(d0){if(d-d0>40&&!z){z=true;fit()}if(d0-d>40&&z){z=false;fit()}}else d0=d}},{passive:true});addEventListener('touchend',()=>d0=0);
+addEventListener('wheel',e=>{z=e.deltaY<0;fit()});
+fetch('activity.json?'+Date.now()).then(r=>r.json()).then(a=>{a.sort((x,y)=>new Date(y.time)-new Date(x.time));
+a.slice(0,3).forEach(en=>{const b=CREW.find(c=>c.n==en.bot);if(b&&en.room)place(b,en.room)});
+let i=0;const show=()=>{const en=a[i++%Math.min(a.length,8)];ticker.textContent=`📡 ${new Date(en.time).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} · ${en.bot}: ${en.text}`};show();setInterval(show,5000)}).catch(()=>ticker.textContent='No activity yet');
+fetch('profits.json?'+Date.now()).then(r=>r.json()).then(p=>{const f=v=>'$'+Number(v).toFixed(2);let t=0;prows.innerHTML=Object.entries(p.sources).map(([k,v])=>{t+=+v;return`<div>${k}: ${f(v)}</div>`}).join('');ptot.textContent=f(t);pupd.textContent='Updated '+p.updated});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
