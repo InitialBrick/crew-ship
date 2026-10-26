@@ -1,110 +1,117 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Crew Ship</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b1030"><link rel="icon" href="icon.svg">
 <style>
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0b1030;font-family:system-ui,sans-serif;color:#fff}
-#space{position:absolute;inset:0;overflow:hidden}
-.layer{position:absolute;inset:0;width:200%;background-repeat:repeat}
-#stars1{animation:drift 60s linear infinite}#stars2{animation:drift 25s linear infinite}
-@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.planet{position:absolute;border-radius:50%;animation:pass linear infinite}
-@keyframes pass{from{left:110%}to{left:-30%}}
-#world{position:absolute;left:50%;top:50%;width:900px;height:560px;margin:-280px 0 0 -450px;transition:transform .8s ease;}
-#bob{width:100%;height:100%;animation:bob 4s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-12px) rotate(.6deg)}}
-.flame{animation:fl .2s infinite alternate}@keyframes fl{to{transform:scaleX(.8)}}
-.bot{position:absolute;width:44px;height:64px;transition:left 1.2s linear,top 1.2s linear;cursor:pointer;z-index:5}
-.bot svg{animation:idle 1.6s ease-in-out infinite}.bot.walk svg{animation:walk .35s infinite alternate}
-@keyframes idle{50%{transform:translateY(-2px)}}@keyframes walk{from{transform:rotate(-6deg)}to{transform:rotate(6deg) translateY(-3px)}}
-.tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;background:#0008;padding:1px 5px;border-radius:6px;white-space:nowrap}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0b1030;font-family:system-ui,sans-serif;color:#fff;touch-action:none}
+canvas{display:block}
+#hud{position:fixed;top:8px;left:8px;right:8px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;z-index:10;pointer-events:none}
+.pill{background:linear-gradient(#ffffff,#e6ecff);color:#223;border-radius:999px;padding:5px 11px;font-weight:800;font-size:13px;box-shadow:0 3px 0 #9aa6d6,0 4px 10px #0006;display:flex;align-items:center;gap:5px}
+.pill.big{font-size:18px;background:linear-gradient(#fff6c2,#ffd34d);box-shadow:0 3px 0 #c99a00,0 4px 10px #0006}
+#mission{width:100%;max-width:360px}#mission .bar{flex:1;height:10px;background:#ccd3ee;border-radius:9px;overflow:hidden}#mission .fill{height:100%;background:linear-gradient(90deg,#4fd1a5,#7dffb0);width:0}
+#upd{font-size:10px;opacity:.7;width:100%;text-align:center;text-shadow:0 1px 2px #000}
 #bubble{position:fixed;display:none;z-index:20;background:#fff;color:#222;border-radius:16px;padding:12px 14px;max-width:260px;box-shadow:0 6px 20px #0008}
 #bubble b{display:block;margin-bottom:4px}#bubble a{display:inline-block;margin-top:8px;background:#5b6cff;color:#fff;padding:7px 12px;border-radius:10px;text-decoration:none;font-weight:600}
-#hud{position:fixed;top:10px;right:10px;background:#0009;border:1px solid #fff3;border-radius:12px;padding:8px 12px;font-size:13px;z-index:10;min-width:140px}
-#hud .tot{font-size:20px;font-weight:800;color:#7dffb0}#hud small{opacity:.6}
+#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90vw,360px);max-height:70vh;overflow:auto;background:#fff8e6;color:#222;border:5px solid #a0764a;border-radius:16px;padding:14px;z-index:30;box-shadow:0 10px 30px #000a}
+#panel button{margin-top:10px;border:0;background:#5b6cff;color:#fff;padding:8px 14px;border-radius:10px}
 #ticker{position:fixed;left:0;right:0;bottom:0;background:#000a;padding:8px 12px;font-size:13px;z-index:10;white-space:nowrap;overflow:hidden}
-#zoom{position:fixed;top:10px;left:10px;z-index:10;background:#5b6cff;border:0;color:#fff;padding:8px 12px;border-radius:10px;font-weight:700}
-.hint{position:fixed;top:52px;left:12px;font-size:11px;opacity:.6;z-index:10}
-</style></head><body>
-<div id="space"><div class="layer" id="stars1"></div><div class="layer" id="stars2"></div>
-<div class="planet" style="top:12%;width:90px;height:90px;background:radial-gradient(circle at 30% 30%,#ffb27d,#c2502d);animation-duration:70s"></div>
-<div class="planet" style="top:72%;width:50px;height:50px;background:radial-gradient(circle at 30% 30%,#9ef0d5,#2a7f8f);animation-duration:45s;animation-delay:-20s"></div>
-<div class="planet" style="top:30%;width:160px;height:160px;opacity:.5;background:radial-gradient(circle at 30% 30%,#c7a8ff,#4b2c8f);animation-duration:120s;animation-delay:-60s"></div></div>
-<div id="world"><div id="bob">
-<svg viewBox="0 0 900 560" width="900" height="560" style="position:absolute;inset:0">
-<defs><pattern id="fl" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#2a3358"/><path d="M0 0H20V20" fill="none" stroke="#33406b" stroke-width="1"/></pattern></defs>
-<g class="flame" style="transform-origin:70px 280px"><path d="M80 240 L10 280 L80 320Z" fill="#ffb02e"/><path d="M80 255 L40 280 L80 305Z" fill="#fff36b"/></g>
-<path d="M90 160 Q70 280 90 400 L240 520 L330 470 L620 470 Q860 420 880 280 Q860 140 620 90 L330 90 L240 40Z" fill="#141a33" stroke="#cfd8ef" stroke-width="10" stroke-linejoin="round"/>
-<g fill="url(#fl)" stroke="#cfd8ef" stroke-width="6" stroke-linejoin="round">
-<rect x="130" y="210" width="170" height="140" rx="14"/>
-<rect x="360" y="70" width="190" height="120" rx="14"/>
-<rect x="360" y="370" width="190" height="110" rx="14"/>
-<rect x="660" y="200" width="170" height="160" rx="40"/>
-<rect x="380" y="225" width="150" height="110" rx="18"/>
-</g>
-<g fill="url(#fl)"><rect x="294" y="262" width="92" height="36"/><rect x="524" y="262" width="142" height="36"/><rect x="437" y="184" width="36" height="47"/><rect x="437" y="329" width="36" height="47"/></g>
-<g stroke="#cfd8ef" stroke-width="6"><path d="M297 262H383M297 298H383M527 262H663M527 298H663M437 187V228M473 187V228M437 332V373M473 332V373"/></g>
-<g fill="#ffd34d"><rect x="290" y="262" width="8" height="36"/><rect x="380" y="262" width="8" height="36"/><rect x="522" y="262" width="8" height="36"/><rect x="658" y="262" width="8" height="36"/><rect x="437" y="182" width="36" height="8"/><rect x="437" y="223" width="36" height="8"/><rect x="437" y="327" width="36" height="8"/><rect x="437" y="368" width="36" height="8"/></g>
-<!-- Pixel studio -->
-<rect x="145" y="222" width="50" height="38" fill="#c94f7c" rx="4"/><rect x="150" y="227" width="12" height="16" fill="#fff"/><rect x="166" y="227" width="12" height="16" fill="#ffe08a"/><rect x="182" y="227" width="9" height="16" fill="#9ef0d5"/>
-<rect x="215" y="295" width="70" height="35" rx="6" fill="#a0764a"/><rect x="230" y="300" width="22" height="26" fill="#fff"/><rect x="258" y="302" width="18" height="22" fill="#ffd34d"/>
-<text x="145" y="342" font-size="12" fill="#fff" font-weight="700">BricksPrints Studio</text>
-<!-- Venture -->
-<rect x="372" y="80" width="70" height="40" rx="4" fill="#111" stroke="#7fd3ff" stroke-width="3"/><polyline points="378,112 395,100 410,105 435,86" fill="none" stroke="#7dffb0" stroke-width="3"/>
-<rect x="465" y="80" width="72" height="40" rx="4" fill="#111" stroke="#ff6bd6" stroke-width="3"/><circle cx="501" cy="100" r="13" fill="none" stroke="#ffd34d" stroke-width="3"/><line x1="501" y1="100" x2="501" y2="90" stroke="#ffd34d" stroke-width="2"/>
-<text x="372" y="182" font-size="12" fill="#fff" font-weight="700">Trivia O'Clock HQ</text>
-<!-- Relay -->
-<circle cx="390" cy="410" r="16" fill="#fff"/><line x1="390" y1="410" x2="390" y2="399" stroke="#222" stroke-width="3"/><line x1="390" y1="410" x2="398" y2="413" stroke="#222" stroke-width="3"/>
-<rect x="485" y="382" width="52" height="42" fill="#fff" rx="3"/><rect x="485" y="382" width="52" height="10" fill="#ff6b6b"/><g fill="#999"><rect x="490" y="398" width="8" height="6"/><rect x="503" y="398" width="8" height="6"/><rect x="516" y="398" width="8" height="6"/><rect x="490" y="410" width="8" height="6"/></g>
-<circle cx="530" cy="458" r="12" fill="#9ad0ff" stroke="#fff" stroke-width="3"/><text x="372" y="472" font-size="12" fill="#fff" font-weight="700">Comms &amp; Calendar</text>
-<!-- Bridge -->
-<path d="M800 220 Q840 280 800 340" fill="none" stroke="#7fd3ff" stroke-width="10" opacity=".7"/>
-<rect x="770" y="250" width="26" height="60" rx="6" fill="#5b6cff"/><circle cx="755" cy="280" r="16" fill="#ffd34d" stroke="#a07b00" stroke-width="3"/>
-<rect x="680" y="212" width="46" height="36" rx="3" fill="#fff"/><g fill="#5b6cff"><rect x="685" y="218" width="34" height="4"/><rect x="685" y="226" width="24" height="4"/><rect x="685" y="234" width="30" height="4"/></g>
-<text x="680" y="350" font-size="12" fill="#fff" font-weight="700">Bridge</text>
-<!-- Common -->
-<ellipse cx="455" cy="300" rx="34" ry="18" fill="#8a95b5"/><circle cx="420" cy="300" r="7" fill="#ff6b6b"/><circle cx="490" cy="300" r="7" fill="#ff6b6b"/>
-<g id="board" style="cursor:pointer"><rect x="420" y="232" width="70" height="38" rx="4" fill="#a0764a" stroke="#ffd34d" stroke-width="3"/><rect x="427" y="238" width="16" height="12" fill="#fff"/><rect x="447" y="240" width="16" height="12" fill="#ffe08a"/><rect x="467" y="237" width="16" height="12" fill="#9ef0d5"/><text x="455" y="265" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">📌 BULLETIN</text></g>
-<text x="392" y="330" font-size="11" fill="#fff" font-weight="700">Common Room</text>
-</svg>
-<div id="bots"></div></div></div>
-<div id="panel" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90vw,360px);max-height:70vh;overflow:auto;background:#fff8e6;color:#222;border:5px solid #a0764a;border-radius:16px;padding:14px;z-index:30;box-shadow:0 10px 30px #000a"><b style="font-size:18px">📌 Crew Accomplishments</b><div id="acc"></div><button onclick="panel.style.display='none'" style="margin-top:10px;border:0;background:#5b6cff;color:#fff;padding:8px 14px;border-radius:10px">Close</button></div>
-<button id="zoom">🔍 Zoom in</button><div class="hint">Tap a crew member to chat · tap the bulletin board</div>
-<div id="hud"><small>PROFIT</small><div class="tot" id="ptot">$0.00</div><div id="prows"></div><small id="pupd"></small></div>
-<div id="ticker">Loading activity…</div>
+.lbl{position:fixed;font-size:11px;font-weight:800;background:#0009;padding:1px 6px;border-radius:7px;pointer-events:none;transform:translate(-50%,-100%);white-space:nowrap;z-index:5}
+</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="hud">
+<div class="pill big">💰 <span id="ptot">$0.00</span></div>
+<div class="pill">🛍️ Etsy <span id="pE">$0</span></div><div class="pill">🎵 TikTok <span id="pT">$0</span></div><div class="pill">✨ Other <span id="pO">$0</span></div>
+<div class="pill">👷 <span id="work">0</span>/4 working</div>
+<div class="pill" id="mission">🎯 <span id="mname">Mission</span><div class="bar"><div class="fill" id="mfill"></div></div><span id="mpct">0%</span></div>
+<div id="upd"></div></div>
 <div id="bubble"></div>
-<script>
-const W=document.getElementById('world'),stars=(n,s,c)=>{let g='';for(let i=0;i<n;i++)g+=`radial-gradient(${s}px ${s}px at ${Math.random()*100}% ${Math.random()*100}%,${c},transparent)`+(i<n-1?',':'');return g};
-stars1.style.backgroundImage=stars(40,1.5,'#fff8');stars1.style.backgroundSize='600px 600px';
-stars2.style.backgroundImage=stars(25,2.5,'#fff');stars2.style.backgroundSize='800px 800px';
-const ROOMS={design:[215,280],studio:[455,140],comms:[455,430],bridge:[730,290],common:[455,325]};
-const DOOR={design:[340,280],studio:[455,205],comms:[455,355],bridge:[595,280],common:[455,325]};
+<div id="panel"><b style="font-size:18px">📌 Crew Accomplishments</b><div id="acc"></div><button onclick="panel.style.display='none'">Close</button></div>
+<div id="ticker">Loading activity…</div>
+<script type="module">
+import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,1.5));R.setSize(innerWidth,innerHeight);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color('#0b1030');
+const cam=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.5,500);cam.position.set(40,62,72);
+const C=new OrbitControls(cam,R.domElement);C.enableDamping=true;C.dampingFactor=.08;C.minDistance=12;C.maxDistance=110;C.maxPolarAngle=1.25;C.enablePan=false;
+S.add(new THREE.HemisphereLight('#dfe8ff','#3a3060',1.6));const sun=new THREE.DirectionalLight('#fff',1.6);sun.position.set(20,40,15);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-25,right:25,top:25,bottom:-25});S.add(sun);
+const M=c=>new THREE.MeshLambertMaterial({color:c,flatShading:true});
+const box=(w,h,d,c,x,y,z,p=S)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;p.add(m);return m};
+// space
+const sg=new THREE.BufferGeometry(),sp=[];for(let i=0;i<900;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(150+Math.random()*100);sp.push(v.x,v.y,v.z)}sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));const stars=new THREE.Points(sg,new THREE.PointsMaterial({color:'#fff',size:.8}));S.add(stars);
+const planets=[['#ff9a5c',9,-70,-20,-60],['#7fe0c8',5,60,-10,-40],['#b48cff',14,-30,-35,90]].map(([c,r,x,y,z])=>{const p=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),M(c));p.position.set(x,y,z);S.add(p);return p});
+// ship
+const ship=new THREE.Group();S.add(ship);
+const hull=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1.2,12),M('#dfe6f5'));hull.scale.set(20,1,14);hull.position.y=-.6;hull.receiveShadow=true;ship.add(hull);
+const under=new THREE.Mesh(new THREE.ConeGeometry(1,1,12),M('#9aa6c8'));under.scale.set(20,4,14);under.rotation.x=Math.PI;under.position.y=-3.2;ship.add(under);
+const nose=new THREE.Mesh(new THREE.ConeGeometry(4,8,8),M('#ff6b6b'));nose.rotation.z=-Math.PI/2;nose.position.set(23,-.5,0);ship.add(nose);
+[[-1],[1]].forEach(([s])=>{box(8,.6,5,'#ff6b6b',-14,-.4,s*15,ship)});
+const flame=new THREE.Mesh(new THREE.ConeGeometry(2.4,7,8),new THREE.MeshBasicMaterial({color:'#ffb02e'}));flame.rotation.z=Math.PI/2;flame.position.set(-24,-.5,0);ship.add(flame);
+const rim=new THREE.Mesh(new THREE.TorusGeometry(1,.04,6,24),M('#8a95b5'));rim.scale.set(20,14,20);rim.rotation.x=Math.PI/2;ship.add(rim);
+const ROOMS={common:[0,0,9,7,'#e9d9b8'],studio:[0,-9.5,9,6,'#3a2b5c'],comms:[0,9.5,9,6,'#1f4d4a'],design:[-12,0,8,8,'#c94f7c'],bridge:[12,0,8,8,'#2b3a67']};
+for(const k in ROOMS){const[x,z,w,d,c]=ROOMS[k];box(w,.2,d,c,x,.1,z,ship);
+ const wall=(W,D,X,Z)=>box(W,1.2,D,'#f4f6ff',X,.7,Z,ship);const g=1.4;
+ // N/S walls (z sides), E/W walls (x sides) with door gaps toward center
+ [[-1,'z'],[1,'z'],[-1,'x'],[1,'x']].forEach(([s,a])=>{const len=a=='z'?w:d;const px=a=='z'?x:x+s*w/2,pz=a=='z'?z+s*d/2:z;
+  const toward=a=='z'?(k=='common'||(s>0&&z<0)||(s<0&&z>0)):(k=='common'||(s>0&&x<0)||(s<0&&x>0));
+  const door=toward&&(k=='common'?(a=='z'||true):true);const seg=(len-g*2)/2;
+  if(!door){a=='z'?wall(len,.3,px,pz):wall(.3,len,px,pz)}else{const o=g+seg/2;a=='z'?(wall(seg,.3,px-o,pz),wall(seg,.3,px+o,pz)):(wall(.3,seg,px,pz-o),wall(.3,seg,px,pz+o))}});}
+box(2.6,.15,3.2,'#cfd5e8',0,.08,-5,ship);box(2.6,.15,3.2,'#cfd5e8',0,.08,5,ship);box(3.6,.15,2.6,'#cfd5e8',-6.3,.08,0,ship);box(3.6,.15,2.6,'#cfd5e8',6.3,.08,0,ship);
+// props
+const tbl=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,.8,10),M('#8a95b5'));tbl.position.set(0,.6,.8);tbl.castShadow=true;ship.add(tbl);
+const board=box(3,1.8,.25,'#a0764a',0,1.5,-3.2,ship);[['#fff',-.8],['#ffe08a',0],['#9ef0d5',.8]].forEach(([c,o])=>box(.6,.7,.05,c,o,1.6,-3.05,ship));board.userData.board=1;
+box(3,1.6,.3,'#111',-2,1.2,-12,ship);box(3,1.6,.3,'#111',2,1.2,-12,ship);box(2.6,1.2,.05,'#7dffb0',-2,1.2,-11.83,ship);box(2.6,1.2,.05,'#ff6bd6',2,1.2,-11.83,ship);
+const clk=new THREE.Mesh(new THREE.CylinderGeometry(1,1,.3,12),M('#fff'));clk.rotation.x=Math.PI/2;clk.position.set(-2.5,1.3,12.2);ship.add(clk);box(2.4,1.8,.3,'#fff',2,1.2,12.2,ship);box(2.4,.4,.32,'#ff6b6b',2,1.95,12.2,ship);
+const tube=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,3,8),new THREE.MeshLambertMaterial({color:'#9ad0ff',transparent:true,opacity:.7}));tube.position.set(3.8,1.5,8);ship.add(tube);
+box(3,.9,1.6,'#a0764a',-12,.55,2,ship);box(1,.05,1.3,'#fff',-12.6,1.05,2,ship);box(1,.05,1.3,'#ffd34d',-11.4,1.05,2,ship);box(.2,2,3,'#c94f7c',-15.7,1.2,-1.5,ship);
+box(1.4,1.2,1.4,'#ffd34d',13.5,.7,0,ship);box(.6,1.6,4,'#5b6cff',15.5,.9,0,ship);box(.2,1.6,2.4,'#fff',8.3,1.1,-2.5,ship);
+// crew
 const CREW=[
 {n:'Pip',id:'d1d562e8-8e61-4836-890f-501af6a8fb51',home:'bridge',c:'#5b6cff',hat:'cap',lines:["Captain on deck! What's the mission?","Task board's looking good today.","Keeping the crew on course.","Steady as she goes."]},
-{n:'Venture',id:'512f2eb0-3d6f-41df-8245-91b5d665bc3c',home:'studio',c:'#ff6bd6',hat:'tie',lines:["Trivia O'Clock: guess before the timer!","Hook in the first second — always.","Checking today's views and follows.","Growth is a daily habit."]},
+{n:'Venture',id:'512f2eb0-3d6f-41df-8245-91b5d665bc3c',home:'studio',c:'#ff6bd6',hat:'tie',lines:["Trivia O'Clock: guess before the timer!","Hook in the first second, always.","Checking today's views and follows.","Growth is a daily habit."]},
 {n:'Relay',id:'4926bc8f-2560-4bb4-8a1b-d155fdad3523',home:'comms',c:'#4fd1a5',hat:'head',lines:["Your calendar's under control.","Got a reminder queued up for you.","Mail tube is clear!","Want me to schedule something?"]},
 {n:'Pixel',id:'72215629-4232-4aaf-ba34-dca662381357',home:'design',c:'#ffb02e',hat:'beret',lines:["BricksPrints is open for business!","Fresh pins going up on Pinterest.","Designing the next printable.","Moving checklist is next on the list."]}];
-const hats={cap:'<path d="M8 14 Q22 0 36 14Z" fill="#223"/><rect x="18" y="4" width="8" height="4" fill="#ffd34d"/>',tie:'<path d="M22 34 l-3 4 3 10 3-10z" fill="#c22"/>',head:'<path d="M8 18 Q22 2 36 18" fill="none" stroke="#333" stroke-width="3"/><circle cx="8" cy="20" r="4" fill="#333"/>',beret:'<ellipse cx="22" cy="8" rx="14" ry="5" fill="#c94f7c"/>'};
-const bd=document.getElementById('bots');
-CREW.forEach(b=>{const e=document.createElement('div');e.className='bot';
-e.innerHTML=`<span class="tag">${b.n}</span><svg viewBox="0 0 44 64" width="44" height="64"><rect x="10" y="30" width="24" height="24" rx="10" fill="${b.c}"/><circle cx="22" cy="20" r="13" fill="#ffe2c4"/><circle cx="17" cy="19" r="2" fill="#222"/><circle cx="27" cy="19" r="2" fill="#222"/><path d="M17 25 Q22 29 27 25" stroke="#222" stroke-width="1.5" fill="none"/>${hats[b.hat]}<rect x="13" y="52" width="6" height="10" rx="3" fill="#334"/><rect x="25" y="52" width="6" height="10" rx="3" fill="#334"/></svg>`;
-b.el=e;bd.appendChild(e);place(b,b.home,0);e.onclick=ev=>{ev.stopPropagation();talk(b)}});
-function setP(b,x,y){b.el.style.left=(x-22)+'px';b.el.style.top=(y-58)+'px'}
-function place(b,room,j=40){room=ROOMS[room]?room:b.home;const[x,y]=ROOMS[room];const t=[x+(Math.random()-.5)*j,y+(Math.random()-.5)*j*.6];
-if(b.room===undefined){b.room=room;b.pos=t;setP(b,...t);return}
-const path=b.room==room?[t]:[DOOR[b.room],ROOMS.common,DOOR[room],t].filter((p,k,a)=>!(b.room=='common'&&k<2)&&!(room=='common'&&k>1)||k==3);
-b.room=room;b.el.classList.add('walk');clearTimeout(b.tm);let k=0;const step=()=>{if(k>=path.length){b.el.classList.remove('walk');return}setP(b,...path[k++]);b.tm=setTimeout(step,1250)};step()}
-setInterval(()=>{const b=CREW[Math.random()*4|0];if(b.el.classList.contains('walk'))return;0&&CREW[Math.random()*4|0];const r=Math.random();if(r<.3){place(b,Math.random()<.4?'common':CREW[Math.random()*4|0].home)}else if(r<.6)place(b,b.home);else place(b,b.room,30)},3500);
-const bub=document.getElementById('bubble');
-function talk(b){const r=b.el.getBoundingClientRect();bub.innerHTML=`<b>${b.n}</b>${b.lines[Math.random()*b.lines.length|0]}<br><a href="grokbot://app/v1/agent?id=${b.id}">Talk to ${b.n}</a>`;bub.style.display='block';bub.style.left=Math.max(8,Math.min(innerWidth-270,r.left-100))+'px';bub.style.top=Math.max(8,r.top-120)+'px'}
-document.body.onclick=()=>bub.style.display='none';
-let z=false,px=0;function fit(){const base=Math.min(innerWidth/900,innerHeight/420);const base2=Math.min(innerWidth/900,innerHeight/560);const s=z?Math.max(base2,Math.min(innerHeight*.6/560,innerWidth/420)):base2*.5;const lim=Math.max(0,(900*s-innerWidth)/2+20);px=z?Math.max(-lim,Math.min(lim,px)):0;W.style.transform=`translateX(${px}px) scale(${s})`;zoom.textContent=z?'🔭 Zoom out':'🔍 Zoom in'}
-zoom.onclick=e=>{e.stopPropagation();z=!z;fit()};addEventListener('resize',fit);fit();
-let d0=0;addEventListener('touchmove',e=>{if(e.touches.length==2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(d0){if(d-d0>40&&!z){z=true;fit()}if(d0-d>40&&z){z=false;fit()}}else d0=d}},{passive:true});addEventListener('touchend',()=>d0=0);
-let dx=null;addEventListener('pointerdown',e=>dx=e.clientX);addEventListener('pointermove',e=>{if(dx!==null&&z){px+=e.clientX-dx;dx=e.clientX;W.style.transition='none';fit()}});addEventListener('pointerup',()=>{dx=null;W.style.transition=''});
-addEventListener('wheel',e=>{z=e.deltaY<0;fit()});
-fetch('activity.json?'+Date.now()).then(r=>r.json()).then(a=>{a.sort((x,y)=>new Date(y.time)-new Date(x.time));
-document.getElementById('board').onclick=e=>{e.stopPropagation();const L=a.filter(x=>x.type=='accomplishment');acc.innerHTML=L.length?L.map(x=>`<div style="margin-top:10px;padding:8px;background:#fff;border-radius:8px">🏆 <b>${x.text}</b><br><small>${x.bot} · ${new Date(x.time).toLocaleDateString()}</small></div>`).join(''):'<p>No accomplishments yet.</p>';panel.style.display='block'};
-a.slice(0,3).forEach(en=>{const b=CREW.find(c=>c.n==en.bot);if(b&&en.room)place(b,en.room)});
-let i=0;const show=()=>{const en=a[i++%Math.min(a.length,8)];ticker.textContent=`📡 ${new Date(en.time).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} · ${en.bot}: ${en.text}`};show();setInterval(show,5000)}).catch(()=>ticker.textContent='No activity yet');
-fetch('profits.json?'+Date.now()).then(r=>r.json()).then(p=>{const f=v=>'$'+Number(v).toFixed(2);let t=0;prows.innerHTML=Object.entries(p.sources).map(([k,v])=>{t+=+v;return`<div>${k}: ${f(v)}</div>`}).join('');ptot.textContent=f(t);pupd.textContent='Updated '+p.updated});
+const DOOR={common:[0,0],studio:[0,-6],comms:[0,6],design:[-8,0],bridge:[8,0]};
+const hits=[board];
+CREW.forEach(b=>{const g=new THREE.Group();box(1,1,.7,b.c,0,.9,0,g);box(.9,.8,.8,'#ffe2c4',0,1.85,0,g);box(.12,.12,.05,'#222',-.2,1.9,.41,g);box(.12,.12,.05,'#222',.2,1.9,.41,g);
+ b.legs=[box(.35,.5,.4,'#334',-.25,.25,0,g),box(.35,.5,.4,'#334',.25,.25,0,g)];
+ if(b.hat=='cap'){box(1,.35,1,'#223',0,2.4,0,g);box(.3,.2,.05,'#ffd34d',0,2.4,.5,g)}if(b.hat=='tie')box(.2,.6,.05,'#c22',0,1,.37,g);
+ if(b.hat=='head'){box(1.1,.15,.2,'#333',0,2.33,0,g);box(.15,.4,.4,'#333',-.5,1.9,0,g)}if(b.hat=='beret')box(1.1,.25,1.1,'#c94f7c',.1,2.38,0,g);
+ g.traverse(o=>o.userData.bot=b);ship.add(g);b.g=g;hits.push(g);b.room=b.home;const[x,z]=ROOMS[b.home];g.position.set(x+(Math.random()-.5)*3,.2,z+(Math.random()-.5)*2);b.path=[];
+ const l=document.createElement('div');l.className='lbl';l.textContent=b.n;document.body.appendChild(l);b.lbl=l});
+function go(b,room){if(!ROOMS[room])room=b.home;const[x,z,w,d]=ROOMS[room];const t=[x+(Math.random()-.5)*(w-3),z+(Math.random()-.5)*(d-3)];
+ b.path=b.room==room?[t]:[DOOR[b.room],DOOR.common,DOOR[room],t];b.room=room}
+// talk lines
+const links=[];function link(a,b){const m=new THREE.LineBasicMaterial({color:'#7fe9ff',transparent:true});const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),m);ship.add(ln);links.push({ln,a,b,t:0})}
+setInterval(()=>{const b=CREW[Math.random()*4|0];if(b.path.length)return;const r=Math.random();
+ if(r<.35){const o=CREW[Math.random()*4|0];if(o!==b){go(b,o.room);b.meet=o}}else if(r<.5)go(b,'common');else go(b,r<.75?b.home:b.room)},3000);
+// interaction
+const ray=new THREE.Raycaster(),pt=new THREE.Vector2();let down;
+R.domElement.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+R.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;bubble.style.display='none';
+ pt.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(pt,cam);const h=ray.intersectObjects(hits,true)[0];if(!h)return;
+ let o=h.object;while(o&&!o.userData.bot&&!o.userData.board)o=o.parent;if(!o)return;if(o.userData.board)return openBoard();const b=o.userData.bot;
+ bubble.innerHTML=`<b>${b.n}</b>${b.lines[Math.random()*b.lines.length|0]}<br><a href="grokbot://app/v1/agent?id=${b.id}">Talk to ${b.n}</a>`;bubble.style.display='block';
+ bubble.style.left=Math.max(8,Math.min(innerWidth-270,e.clientX-120))+'px';bubble.style.top=Math.max(90,e.clientY-140)+'px'});
+let ACT=[];function openBoard(){const L=ACT.filter(x=>x.type=='accomplishment');acc.innerHTML=L.length?L.map(x=>`<div style="margin-top:10px;padding:8px;background:#fff;border-radius:8px">🏆 <b>${x.text}</b><br><small>${x.bot} · ${new Date(x.time).toLocaleDateString()}</small></div>`).join(''):'<p>No accomplishments yet.</p>';panel.style.display='block'}
+// loop
+const clock=new THREE.Clock(),v=new THREE.Vector3(),wv=new THREE.Vector3();
+R.setAnimationLoop(()=>{const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;
+ ship.position.y=Math.sin(t*1.2)*.6;ship.rotation.z=Math.sin(t*.8)*.02;ship.rotation.x=Math.sin(t*.6)*.015;flame.scale.y=1+Math.sin(t*20)*.15;
+ stars.rotation.y+=dt*.01;planets.forEach((p,i)=>{p.position.x+=dt*(2+i);if(p.position.x>120)p.position.x=-120;p.rotation.y+=dt*.2});
+ let working=0;CREW.forEach(b=>{const g=b.g;if(b.path.length){const[tx,tz]=b.path[0];const dx=tx-g.position.x,dz=tz-g.position.z,dd=Math.hypot(dx,dz);
+   if(dd<.15){b.path.shift();if(!b.path.length&&b.meet){link(b,b.meet);b.meet=null}}else{const s=Math.min(dd,dt*3);g.position.x+=dx/dd*s;g.position.z+=dz/dd*s;g.rotation.y=Math.atan2(dx,dz)}
+   b.legs[0].position.y=.25+Math.abs(Math.sin(t*12))*.2;b.legs[1].position.y=.25+Math.abs(Math.cos(t*12))*.2;g.position.y=.2}
+  else{g.position.y=.2+Math.abs(Math.sin(t*2+b.n.length))*.08;if(b.room==b.home)working++}
+  g.getWorldPosition(wv);wv.y+=2.9;v.copy(wv).project(cam);b.lbl.style.display=v.z<1?'block':'none';b.lbl.style.left=(v.x+1)/2*innerWidth+'px';b.lbl.style.top=(1-v.y)/2*innerHeight+'px'});
+ work.textContent=working;
+ for(let i=links.length-1;i>=0;i--){const L=links[i];L.t+=dt;const p=L.ln.geometry.attributes.position;p.setXYZ(0,L.a.g.position.x,1.5,L.a.g.position.z);p.setXYZ(1,L.b.g.position.x,1.5,L.b.g.position.z);p.needsUpdate=true;
+  L.ln.material.opacity=(.5+.5*Math.sin(L.t*8))*Math.max(0,1-L.t/4);if(L.t>4){ship.remove(L.ln);L.ln.geometry.dispose();links.splice(i,1)}}
+ C.update();R.render(S,cam)});
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});
+fetch('activity.json?'+Date.now()).then(r=>r.json()).then(a=>{a.sort((x,y)=>new Date(y.time)-new Date(x.time));ACT=a;
+ a.slice(0,3).forEach(en=>{const b=CREW.find(c=>c.n==en.bot);if(b&&en.room)go(b,en.room)});
+ let i=0;const show=()=>{const en=a[i++%Math.min(a.length,8)];ticker.textContent=`📡 ${new Date(en.time).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} · ${en.bot}: ${en.text}`};show();setInterval(show,5000)}).catch(()=>ticker.textContent='No activity yet');
+fetch('profits.json?'+Date.now()).then(r=>r.json()).then(p=>{const f=v=>'$'+Number(v).toFixed(2);const s=p.sources;const tot=Object.values(s).reduce((a,b)=>a+ +b,0);
+ ptot.textContent=f(tot);pE.textContent=f(s.Etsy||0);pT.textContent=f(s.TikTok||0);pO.textContent=f(s.Other||0);upd.textContent='Profits updated '+p.updated;
+ const m=p.mission||{name:'First $25 profit',goal:25};const pc=Math.min(100,tot/m.goal*100);mname.textContent=m.name;mfill.style.width=pc+'%';mpct.textContent=Math.round(pc)+'%'});
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script></body></html>

@@ -1,1 +1,13 @@
-{"updated":"2026-10-26","currency":"USD","sources":{"Etsy":0,"TikTok":0,"Other":0}}
+{
+ "updated": "2026-10-26",
+ "currency": "USD",
+ "sources": {
+  "Etsy": 0,
+  "TikTok": 0,
+  "Other": 0
+ },
+ "mission": {
+  "name": "First $25 profit",
+  "goal": 25
+ }
+}
